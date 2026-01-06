@@ -1,0 +1,23 @@
+# ASP.NET Core
+bin/
+obj/
+.vs/
+*.user
+*.pdb
+*.suo
+*.cache
+appsettings.Development.json
+
+# Angular
+node_modules/
+dist/
+.angular/
+.vscode/
+package-lock.json
+
+# System
+Thumbs.db
+.DS_Store
+
+# User specific
+.gemini/
