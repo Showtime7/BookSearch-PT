@@ -14,12 +14,14 @@ Esta es una aplicación web desarrollada como prueba técnica para buscar libros
 - **Filtros y Paginación**: Capacidad para filtrar por género/año y navegar entre páginas de resultados.
 - **Sistema de Favoritos Completo**: 
   - Gestión de favoritos (Añadir/Eliminar) protegida por autenticación.
-  - Almacenamiento en memoria (Backend) con validaciones.
+- **Almacenamiento en Memoria (Backend)** con validaciones. (Despreciado)
+  - **Persistencia en SQL Server**: Base de datos relacional para usuarios y favoritos.
   - Página dedicada "Mis Favoritos" para usuarios registrados.
 - **Diseño Responsive**: Interfaz adaptada a dispositivos móviles y escritorio (Mobile-first) con una estética cálida y minimalista.
 
 ## Requisitos Previos para que funcione la app
 - **.NET SDK**: Versión 8.0 o superior.
+- **SQL Server**: Instancia local (Express o Developer).
 - **Node.js**: Versión 20 (LTS) o superior recomendada.
 - **Angular CLI**: Versión 17 o superior (`npm install -g @angular/cli`).
 

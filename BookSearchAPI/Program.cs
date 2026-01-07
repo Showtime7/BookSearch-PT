@@ -1,4 +1,5 @@
 using BookSearchAPI.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,11 @@ builder.Services.AddSwaggerGen();
 // Register Services
 builder.Services.AddHttpClient<IBookService, BookService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddSingleton<IFavoriteService, FavoriteService>(); // Singleton for in-memory persistence
+builder.Services.AddScoped<IFavoriteService, FavoriteService>(); // Scoped for EF Core
+
+// Register DbContext
+builder.Services.AddDbContext<BookSearchAPI.Data.ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure JWT Authentication
 var key = System.Text.Encoding.ASCII.GetBytes(AuthService.SecretKey);

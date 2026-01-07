@@ -20,8 +20,8 @@ namespace BookSearchAPI.Controllers
 
         private string GetCurrentUserId()
         {
-            // Extract username from Claims
-            return User.FindFirst(ClaimTypes.Name)?.Value ?? "anonymous";
+            // Extract UserId from Claims (set in AuthService)
+            return User.FindFirst("UserId")?.Value ?? string.Empty;
         }
 
         [HttpPost]

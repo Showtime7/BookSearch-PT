@@ -9,12 +9,23 @@ namespace BookSearchAPI.Services
     public class AuthService : IAuthService
     {
         // For POC only. In production, use User Secrets or Environment Variables.
-        public const string SecretKey = "SuperSecretKeyForBookSearchApp_MustBeLongEnough"; 
+        public const string SecretKey = "SuperSecretKeyForBookSearchApp_MustBeLongEnough";
+        
+        private readonly BookSearchAPI.Data.ApplicationDbContext _context;
+
+        public AuthService(BookSearchAPI.Data.ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         public LoginResponse? Login(LoginRequest request)
         {
-            // Simple hardcoded validation
-            if (request.Username == "admin" && request.Password == "admin123")
+            // Find user by username
+            var user = _context.Users.SingleOrDefault(u => u.Username == request.Username);
+
+            // Validate user and password (PasswordHash is currently plain text based on seed data)
+            // In a real app, use BCrypt.Verify(request.Password, user.PasswordHash)
+            if (user != null && user.PasswordHash == request.Password)
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(SecretKey);
@@ -22,16 +33,17 @@ namespace BookSearchAPI.Services
                 {
                     Subject = new ClaimsIdentity(new[] 
                     { 
-                        new Claim(ClaimTypes.Name, request.Username) 
+                        new Claim(ClaimTypes.Name, user.Username),
+                        new Claim("UserId", user.Id.ToString()) // Add UserId claim
                     }),
-                    Expires = DateTime.UtcNow.AddHours(2), // 2 hours expiration
+                    Expires = DateTime.UtcNow.AddHours(2),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
 
                 return new LoginResponse
                 {
-                    Username = request.Username,
+                    Username = user.Username,
                     Token = tokenHandler.WriteToken(token)
                 };
             }
