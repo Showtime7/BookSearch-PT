@@ -2,6 +2,8 @@ import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Fallback if Needed, but usually imports specific directives
 import { BookDoc } from '../../../core/models/book.model';
 import { AuthService } from '../../../core/services/auth.service';
+import { FavoriteService } from '../../../core/services/favorite.service';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-book-card',
@@ -16,10 +18,14 @@ import { AuthService } from '../../../core/services/auth.service';
         
         <!-- Favorite Button Overlay (Only when logged in) -->
         @if (authService.isLoggedIn()) {
-          <button class="absolute top-2 right-2 bg-white/90 p-2 rounded-full shadow-md text-gray-400 hover:text-red-500 transition-colors backdrop-blur-sm"
-                  title="Add to Favorites"
+          <button class="absolute top-2 right-2 bg-white/90 p-2 rounded-full shadow-md transition-colors backdrop-blur-sm"
+                  [class.text-red-500]="isFavorite()"
+                  [class.fill-current]="isFavorite()"
+                  [class.text-gray-400]="!isFavorite()"
+                  [class.hover:text-red-500]="!isFavorite()"
+                  title="Toggle Favorite"
                   (click)="toggleFavorite($event)">
-             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+             <svg xmlns="http://www.w3.org/2000/svg" [attr.fill]="isFavorite() ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
             </svg>
           </button>
@@ -46,7 +52,10 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class BookCardComponent {
   @Input({ required: true }) book!: BookDoc;
+
   authService = inject(AuthService);
+  favoriteService = inject(FavoriteService);
+  toastService = inject(ToastService); // For login prompt
 
   getCoverUrl(book: BookDoc): string {
     return book.cover_i
@@ -54,12 +63,22 @@ export class BookCardComponent {
       : 'https://placehold.co/200x300?text=No+Cover';
   }
 
+  isFavorite(): boolean {
+    return this.favoriteService.isFavorite(this.book.key);
+  }
+
   toggleFavorite(event: Event) {
     event.stopPropagation();
-    // Logic to be implemented. For now just visual interaction.
-    // Ideally user state would track favorites.
-    const btn = (event.currentTarget as HTMLElement);
-    btn.classList.toggle('text-red-500');
-    btn.classList.toggle('fill-current'); // Fill icon
+
+    // Check if favorite
+    if (this.isFavorite()) {
+      this.favoriteService.removeFavorite(this.book.key).subscribe();
+    } else {
+      // Pass the computed URL if not present
+      if (!this.book.coverUrl) {
+        this.book.coverUrl = this.getCoverUrl(this.book);
+      }
+      this.favoriteService.addFavorite(this.book).subscribe();
+    }
   }
 }

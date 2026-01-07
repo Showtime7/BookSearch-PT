@@ -1,0 +1,17 @@
+@if (toastService.toasts().length > 0) {
+<div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+    @for (toast of toastService.toasts(); track toast.id) {
+    <div class="pointer-events-auto min-w-[300px] p-4 rounded-lg shadow-lg transform transition-all duration-300 animate-slide-in"
+        [class.bg-green-500]="toast.type === 'success'" [class.bg-red-500]="toast.type === 'error'"
+        [class.bg-blue-500]="toast.type === 'info'" [class.bg-yellow-500]="toast.type === 'warning'"
+        [class.text-white]="true">
+        <div class="flex justify-between items-center bg-transparent">
+            <span class="font-medium bg-transparent">{{ toast.message }}</span>
+            <button (click)="toastService.remove(toast.id)" class="ml-4 text-white hover:text-gray-200 bg-transparent">
+                ✕
+            </button>
+        </div>
+    </div>
+    }
+</div>
+}

@@ -12,12 +12,16 @@ Esta es una aplicación web desarrollada como prueba técnica para buscar libros
 - **Búsqueda de Libros**: Funcionalidad pública que permite buscar libros por título o autor sin necesidad de registro.
 - **Sistema de Login Opcional**: Acceso para usuarios administradores.
 - **Filtros y Paginación**: Capacidad para filtrar por género/año y navegar entre páginas de resultados.
+- **Sistema de Favoritos Completo**: 
+  - Gestión de favoritos (Añadir/Eliminar) protegida por autenticación.
+  - Almacenamiento en memoria (Backend) con validaciones.
+  - Página dedicada "Mis Favoritos" para usuarios registrados.
 - **Diseño Responsive**: Interfaz adaptada a dispositivos móviles y escritorio (Mobile-first) con una estética cálida y minimalista.
 
 ## Requisitos Previos para que funcione la app
 - **.NET SDK**: Versión 8.0 o superior.
-- **Node.js**: Versión 24 (LTS) o superior recomendada.
-- **Angular CLI**: Versión 21 o superior (`npm install -g @angular/cli`).
+- **Node.js**: Versión 20 (LTS) o superior recomendada.
+- **Angular CLI**: Versión 17 o superior (`npm install -g @angular/cli`).
 
 ## Instalación y Configuración
 
@@ -47,7 +51,8 @@ Asegúrate de tener la carpeta raíz `Prueba_Tecnica` con los subdirectorios `Bo
 
 ## Configuración Adicional
 - **CORS**: El backend está configurado en `Program.cs` para permitir peticiones desde `http://localhost:4200`. Si el puerto del frontend cambia, debe actualizarse esta política.
-- **URL de API**: El frontend apunta a `http://localhost:5258` en `auth.service.ts` y `book.service.ts`. Si el backend se ejecuta en otro puerto, actualiza estos archivos.
+- **URL de API**: El frontend apunta a `http://localhost:5258` en `auth.service.ts` y `favorite.service.ts`. Si el backend se ejecuta en otro puerto, actualiza estos archivos.
+- **Persistencia**: Los favoritos se almacenan en memoria volátil. Al reiniciar el backend, la lista se limpiará.
 
 ## Credenciales de Prueba
 Para verificar las funcionalidades restringidas (botón de favoritos):
@@ -58,14 +63,14 @@ Para verificar las funcionalidades restringidas (botón de favoritos):
 ```
 Prueba_Tecnica/
 ├── BookSearchAPI/          # Backend ASP.NET Core
-│   ├── Controllers/        # Endpoints (Auth, Books)
-│   ├── Services/           # Lógica de negocio y cliente HTTP
-│   └── Models/             # DTOs y modelos de datos
+│   ├── Controllers/        # Endpoints (Auth, Books, Favorites)
+│   ├── Services/           # Lógica de negocio (FavoriteService, AuthService)
+│   └── Models/             # DTOs y modelos de datos (Favorites, Books)
 │
 └── book-search-client/     # Frontend Angular
-    ├── src/app/core/       # Servicios (Auth, Book) y Modelos
-    ├── src/app/features/   # Componentes (Login, Search, BookCard)
-    └── src/app/shared/     # Componentes comunes (Header)
+    ├── src/app/core/       # Servicios (Auth, Book, Favorite) y Modelos
+    ├── src/app/features/   # Vistas (Login, Search, Favorites, BookCard)
+    └── src/app/shared/     # Componentes comunes (Header, Toast)
 ```
 
 ## API Utilizada
@@ -73,5 +78,5 @@ El proyecto consume la **Open Library Search API**.
 - **Documentación**: [https://openlibrary.org/dev/docs/api/search](https://openlibrary.org/dev/docs/api/search)
 
 ## Funcionalidades Pendientes
-- [ ] Implementación completa del sistema de favoritos (persistencia en backend/BD).
 - [ ] Conexión a una base de datos real (SQL Server/PostgreSQL) para usuarios y favoritos.
+- [ ] Registro de nuevos usuarios.

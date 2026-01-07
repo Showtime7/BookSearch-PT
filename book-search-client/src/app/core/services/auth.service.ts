@@ -1,6 +1,7 @@
-import { Injectable, signal, WritableSignal } from '@angular/core';
+import { Injectable, signal, WritableSignal, inject, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, of } from 'rxjs';
+import { Router } from '@angular/router';
 import { LoginResponse, User } from '../models/user.model';
 
 @Injectable({
@@ -12,19 +13,28 @@ export class AuthService {
     // Signal to hold current user state
     public currentUser: WritableSignal<User | null> = signal(null);
 
+    private router = inject(Router);
+
     constructor(private http: HttpClient) {
         // Try to restore session from localStorage
         const saved = localStorage.getItem('user');
         if (saved) {
             this.currentUser.set(JSON.parse(saved));
         }
+
+
     }
 
     login(credentials: { username: string, password: string }): Observable<LoginResponse> {
         return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
             tap(response => {
-                this.currentUser.set(response);
-                localStorage.setItem('user', JSON.stringify(response));
+                // Map response to User structure if needed, or if LoginResponse has token
+                const user: User = {
+                    username: response.username,
+                    token: response.token
+                };
+                this.currentUser.set(user);
+                localStorage.setItem('user', JSON.stringify(user));
             })
         );
     }
@@ -32,11 +42,15 @@ export class AuthService {
     logout(): void {
         this.currentUser.set(null);
         localStorage.removeItem('user');
-        // Optional: Call backend logout
-        // this.http.post(`${this.apiUrl}/logout`, {}).subscribe();
+        this.router.navigate(['/']);
     }
 
     isLoggedIn(): boolean {
         return !!this.currentUser();
+    }
+
+    getToken(): string | null {
+        const user = this.currentUser();
+        return user?.token || null;
     }
 }
