@@ -18,7 +18,7 @@ namespace BookSearchAPI.Services
         {
             if (!int.TryParse(userId, out int uid)) return false;
 
-            // Check if already exists
+            // Verifica si ya existe para evitar duplicados
             if (_context.Favorites.Any(f => f.UserId == uid && f.ExternalId == request.ExternalId))
             {
                 return false;
@@ -29,9 +29,9 @@ namespace BookSearchAPI.Services
                 UserId = uid,
                 ExternalId = request.ExternalId,
                 Title = request.Title,
-                Authors = string.Join(", ", request.Authors), // Convert List<string> to comma separated string
+                Authors = string.Join(", ", request.Authors), // Convierte lista a string
                 CoverUrl = request.CoverUrl
-                // FirstPublishYear not in request currently, optional
+                // FirstPublishYear es opcional
             };
 
             _context.Favorites.Add(favorite);

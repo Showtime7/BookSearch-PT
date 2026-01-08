@@ -3,6 +3,7 @@ using BookSearchAPI.Models;
 
 namespace BookSearchAPI.Services
 {
+    // Servicio para interactuar con la API de OpenLibrary
     public class BookService : IBookService
     {
         private readonly HttpClient _httpClient;
@@ -14,8 +15,7 @@ namespace BookSearchAPI.Services
 
         public async Task<BookSearchResponse?> SearchBooksAsync(string query, int page = 1, int? year = null, string? genre = null)
         {
-            // Build URL
-            // https://openlibrary.org/search.json?q=the+lord+of+the+rings&page=1
+            // Construye la URL de búsqueda
             var url = $"https://openlibrary.org/search.json?q={Uri.EscapeDataString(query)}&page={page}";
 
             if (year.HasValue)
@@ -23,12 +23,7 @@ namespace BookSearchAPI.Services
                 url += $"&first_publish_year={year.Value}";
             }
             
-            // Genre search in OpenLibrary is usually q=subject:genre or just implicit. 
-            // The prompt asks for "Input de búsqueda por título o género". 
-            // If the user inputs a genre in the main input, it's just 'q'.
-            // If there is a separate filter for genre, we might append it.
-            // Let's assume the query handles title/genre mixed or generic search.
-            // But if 'genre' parameter is provided explicitly:
+            // Agrega filtro de género si existe (usando 'subject')
              if (!string.IsNullOrEmpty(genre))
             {
                 url += $"&subject={Uri.EscapeDataString(genre)}";

@@ -7,16 +7,20 @@ import { LoginResponse, User } from '../models/user.model';
 @Injectable({
     providedIn: 'root'
 })
+@Injectable({
+    providedIn: 'root'
+})
+// Servicio de autenticación y gestión de estado de usuario
 export class AuthService {
-    private apiUrl = 'http://localhost:5258/api/auth'; // Adjust port if needed
+    private apiUrl = 'http://localhost:5258/api/auth'; 
 
-    // Signal to hold current user state
+    // Signal para mantener el estado reactivo del usuario
     public currentUser: WritableSignal<User | null> = signal(null);
 
     private router = inject(Router);
 
     constructor(private http: HttpClient) {
-        // Try to restore session from localStorage
+        // Restaura la sesión desde localStorage si existe
         const saved = localStorage.getItem('user');
         if (saved) {
             this.currentUser.set(JSON.parse(saved));
@@ -25,10 +29,10 @@ export class AuthService {
 
     }
 
+    // Inicia sesión y actualiza el estado local
     login(credentials: { username: string, password: string }): Observable<LoginResponse> {
         return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
             tap(response => {
-                // Map response to User structure if needed, or if LoginResponse has token
                 const user: User = {
                     username: response.username,
                     token: response.token
@@ -39,16 +43,19 @@ export class AuthService {
         );
     }
 
+    // Cierra sesión y limpia el almacenamiento
     logout(): void {
         this.currentUser.set(null);
         localStorage.removeItem('user');
         this.router.navigate(['/']);
     }
 
+    // Verifica si hay un usuario autenticado
     isLoggedIn(): boolean {
         return !!this.currentUser();
     }
 
+    // Obtiene el token JWT actual
     getToken(): string | null {
         const user = this.currentUser();
         return user?.token || null;

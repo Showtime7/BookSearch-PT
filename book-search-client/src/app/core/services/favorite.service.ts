@@ -8,16 +8,18 @@ import { ToastService } from '../../shared/services/toast.service';
 @Injectable({
     providedIn: 'root'
 })
+// Servicio para gestión de favoritos (CRUD y estado visual)
 export class FavoriteService {
     private http = inject(HttpClient);
     private toastService = inject(ToastService);
-    private apiUrl = 'http://localhost:5258/api/favorites'; // Hardcoded for POC
+    private apiUrl = 'http://localhost:5258/api/favorites';
 
-    // Local state for fast UI updates
+    // Estado local reactivo de favoritos
     favorites = signal<FavoriteBook[]>([]);
 
     constructor() { }
 
+    // Obtiene favoritos del API y actualiza la señal
     getFavorites(): Observable<FavoriteBook[]> {
         return this.http.get<FavoriteBook[]>(this.apiUrl).pipe(
             tap(favs => this.favorites.set(favs)),
@@ -28,6 +30,7 @@ export class FavoriteService {
         );
     }
 
+    // Envía petición para guardar favorito
     addFavorite(book: BookDoc): Observable<any> {
         const payload = {
             externalId: book.key,
@@ -39,7 +42,7 @@ export class FavoriteService {
         return this.http.post(this.apiUrl, payload).pipe(
             tap(() => {
                 this.toastService.show('Agregado a favoritos', 'success');
-                // Optimistic update or refresh? Let's refresh for consistency
+                // Actualiza la lista local
                 this.getFavorites().subscribe();
             }),
             catchError((error: HttpErrorResponse) => {
@@ -53,6 +56,7 @@ export class FavoriteService {
         );
     }
 
+    // Elimina favorito y actualiza la lista local
     removeFavorite(externalId: string): Observable<any> {
         return this.http.delete(this.apiUrl, { params: { externalId } }).pipe(
             tap(() => {
@@ -70,12 +74,12 @@ export class FavoriteService {
         return this.favorites().some(f => f.externalId === externalId);
     }
 
-    // Method to check initial status from API if needed, 
-    // currently relying on getting all favorites at app start/login
+    // Carga inicial de favoritos
     loadFavorites() {
         this.getFavorites().subscribe();
     }
 
+    // Limpia el estado local (al cerrar sesión)
     clearFavorites() {
         this.favorites.set([]);
     }

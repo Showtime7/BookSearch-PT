@@ -50,6 +50,7 @@ import { ToastService } from '../../../shared/services/toast.service';
     </div>
   `
 })
+// Tarjeta visual para mostrar información de un libro
 export class BookCardComponent {
   @Input({ required: true }) book!: BookDoc;
 
@@ -57,24 +58,26 @@ export class BookCardComponent {
   favoriteService = inject(FavoriteService);
   toastService = inject(ToastService); // For login prompt
 
+  // Obtiene la URL de la portada desde OpenLibrary
   getCoverUrl(book: BookDoc): string {
     return book.cover_i
       ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
       : 'https://placehold.co/200x300?text=No+Cover';
   }
 
+  // Verifica si el libro es favorito actualmente
   isFavorite(): boolean {
     return this.favoriteService.isFavorite(this.book.key);
   }
 
+  // Alterna el estado de favorito del libro
   toggleFavorite(event: Event) {
     event.stopPropagation();
 
-    // Check if favorite
     if (this.isFavorite()) {
       this.favoriteService.removeFavorite(this.book.key).subscribe();
     } else {
-      // Pass the computed URL if not present
+      // Asegura que tenga coverUrl antes de enviar
       if (!this.book.coverUrl) {
         this.book.coverUrl = this.getCoverUrl(this.book);
       }

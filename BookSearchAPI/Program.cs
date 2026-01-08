@@ -3,23 +3,22 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Agrega servicios al contenedor
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Configuración de Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register Services
+// Registro de Servicios
 builder.Services.AddHttpClient<IBookService, BookService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IFavoriteService, FavoriteService>(); // Scoped for EF Core
+builder.Services.AddScoped<IFavoriteService, FavoriteService>(); // Scoped para EF Core
 
-// Register DbContext
+// Registro del DbContext (SQL Server)
 builder.Services.AddDbContext<BookSearchAPI.Data.ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configure JWT Authentication
+// Configuración de Autenticación JWT
 var key = System.Text.Encoding.ASCII.GetBytes(AuthService.SecretKey);
 builder.Services.AddAuthentication(options =>
 {
@@ -39,7 +38,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Configure CORS
+// Configuración de CORS (Permitir Angular)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular",
@@ -53,7 +52,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configura el pipeline de solicitudes HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

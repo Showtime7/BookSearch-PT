@@ -8,7 +8,7 @@ namespace BookSearchAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // All endpoints require login
+    [Authorize] // Requiere autenticación
     public class FavoritesController : ControllerBase
     {
         private readonly IFavoriteService _favoriteService;
@@ -18,12 +18,13 @@ namespace BookSearchAPI.Controllers
             _favoriteService = favoriteService;
         }
 
+        // Obtiene el ID del usuario actual desde las Claims del Token
         private string GetCurrentUserId()
         {
-            // Extract UserId from Claims (set in AuthService)
             return User.FindFirst("UserId")?.Value ?? string.Empty;
         }
 
+        // Agrega un nuevo libro a favoritos
         [HttpPost]
         public IActionResult AddFavorite([FromBody] AddFavoriteRequest request)
         {
@@ -34,12 +35,13 @@ namespace BookSearchAPI.Controllers
 
             if (!success)
             {
-                return Conflict(new { message = "Book already in favorites" }); // 409
+                return Conflict(new { message = "Este libro ya está en tus favoritos" });
             }
 
             return Ok(new { message = "Added to favorites" });
         }
 
+        // Obtiene la lista de favoritos del usuario
         [HttpGet]
         public IActionResult GetFavorites()
         {
@@ -48,6 +50,7 @@ namespace BookSearchAPI.Controllers
             return Ok(list);
         }
 
+        // Elimina un libro de favoritos
         [HttpDelete]
         public IActionResult RemoveFavorite([FromQuery] string externalId)
         {
@@ -62,6 +65,7 @@ namespace BookSearchAPI.Controllers
             return Ok(new { message = "Removed from favorites" });
         }
 
+        // Verifica si un libro específico ya es favorito
         [HttpGet("check/{externalId}")]
         public IActionResult IsFavorite(string externalId)
         {

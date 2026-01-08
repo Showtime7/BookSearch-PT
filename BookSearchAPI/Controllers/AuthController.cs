@@ -6,8 +6,10 @@ namespace BookSearchAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
+        // Servicio de autenticación inyectado
         private readonly IAuthService _authService;
 
         public AuthController(IAuthService authService)
@@ -15,6 +17,7 @@ namespace BookSearchAPI.Controllers
             _authService = authService;
         }
 
+        // Inicia sesión y retorna un token JWT válido
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
@@ -26,11 +29,10 @@ namespace BookSearchAPI.Controllers
             return Ok(response);
         }
 
+        // Cierra la sesión (simulado, ya que JWT es stateless)
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            // Stateless JWT/Token usually means logout is client-side, 
-            // but we can have an endpoint if needed for cookies or future extension.
             return Ok(new { message = "Logged out successfully" });
         }
     }

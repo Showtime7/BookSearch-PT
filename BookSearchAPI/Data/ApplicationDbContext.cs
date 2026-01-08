@@ -3,6 +3,7 @@ using BookSearchAPI.Models;
 
 namespace BookSearchAPI.Data
 {
+    // Contexto principal de la base de datos
     public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -17,15 +18,15 @@ namespace BookSearchAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure User
+            // Configuración de User (Índice único)
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
 
-            // Configure Favorite
+            // Configuración de Favorite (Índice compuesto único)
             modelBuilder.Entity<Favorite>()
                 .HasIndex(f => new { f.UserId, f.ExternalId })
-                .IsUnique(); // Prevent duplicate favorites for same user
+                .IsUnique(); // Evita duplicados por usuario
 
             modelBuilder.Entity<Favorite>()
                 .HasOne(f => f.User)
